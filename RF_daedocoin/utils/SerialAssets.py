@@ -3,7 +3,7 @@ from utils.imports import *
 class SerialAgent:
     def __init__(self):
         logging.basicConfig(level=logging.INFO, format='%(message)s')
-        self.rfagent = self.serialSetup('/dev/ttyS1')
+        self.rfagent = self.serialSetup('/dev/ttyS0')
 
     def readAvailablePorts(self):
         self.portsList = sp.comports()
