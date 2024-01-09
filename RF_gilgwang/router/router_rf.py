@@ -34,27 +34,27 @@ async def rfpayment(item : paymentModel): #item: paymentModel
     pay, stat = 0, False
     remaining_amt = 0
 
-    while(cnt < 5):
-        # print(f"item.pay_amount:{item.pay_amount}")
-        rf.send_command(readerComponents.REMAINING, item.pay_amount)
-        stat, command, charge_amt, remaining_amt = await rf.read_response(1024)
-        if stat:
-            break
-        cnt += 1
-        if cnt == 5:
-            rf.send_command(readerComponents.REMAINING, 0)
+    # while(cnt < 3):
+    #     # print(f"item.pay_amount:{item.pay_amount}")
+    #     rf.send_command(readerComponents.REMAINING, item.pay_amount)
+    #     stat, command, charge_amt, remaining_amt = await rf.read_response(1024)
+    #     if stat:
+    #         break
+    #     cnt += 1
+    #     if cnt == 5:
+    #         rf.send_command(readerComponents.REMAINING, 0)
 
-    if item.pay_amount > remaining_amt:
-        ret = respModel(
-            status=False,
-            command='',
-            pay_amount=item.pay_amount,
-            rem_amount=remaining_amt
-        )
-        return ret
+    # if item.pay_amount > remaining_amt:
+    #     ret = respModel(
+    #         status=False,
+    #         command='',
+    #         pay_amount=item.pay_amount,
+    #         rem_amount=remaining_amt
+    #     )
+    #     return ret
 
-    cnt = 0
-    while(cnt < 5):
+    # cnt = 0
+    while(cnt < 3):
         # print(f"item.pay_amount:{item.pay_amount}")
         rf.send_command(readerComponents.PAYMENT, item.pay_amount)
         stat, command, charge_amt, remaining_amt = await rf.read_response(1024)
@@ -65,13 +65,20 @@ async def rfpayment(item : paymentModel): #item: paymentModel
             rf.send_command(readerComponents.CHARGE, 0)
 
     rfserial._close_port(rfserial.rfagent)
-
-    ret = respModel(
-        status = stat,
-        command=command,
-        pay_amount=item.pay_amount,
-        rem_amount=remaining_amt
-    )
+    if command in ["LOWBALANCE", "ERROR1", "ERROR2"]:
+        ret = respModel(
+            status = False,
+            command=command,
+            pay_amount=item.pay_amount,
+            rem_amount=remaining_amt
+        )
+    else:
+        ret = respModel(
+            status = stat,
+            command=command,
+            pay_amount=item.pay_amount,
+            rem_amount=remaining_amt
+        )
     return ret
 
 @router.post("/rfcharge",response_model=respModel,status_code=status.HTTP_200_OK, description="rf charge input amount")

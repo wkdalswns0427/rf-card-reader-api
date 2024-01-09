@@ -34,7 +34,7 @@ class SerialAgent:
         if agent.is_open:
             agent.close()
     
-    def read(self, agent, size, timeout = 3):
+    def read(self, agent, size, timeout = 2):
         agent.timeout = timeout
         ret = agent.read(size)
         agent.flush()

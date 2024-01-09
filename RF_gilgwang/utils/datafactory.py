@@ -106,6 +106,12 @@ class DataFactory:
                 camt, ramt = 0, 0
                 return command, camt, ramt
 
+            elif data[1] == 0xE3:
+                command = "LOWBALANCE"
+                # low balance
+                camt, ramt = 0, 0
+                return command, camt, ramt
+
         except:
             with Exception as e:
                 print(e)
